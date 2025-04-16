@@ -15,17 +15,17 @@ function MainApp() {
   const [patients, setPatients] = useState([]);
 
   useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const data = await getPatients();
+        setPatients(data);
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+      }
+    };
+
     fetchPatients();
   }, []);
-
-  const fetchPatients = async () => {
-    try {
-      const data = await getPatients();
-      setPatients(data);
-    } catch (error) {
-      console.error('Error fetching patients:', error);
-    }
-  };
 
   const handleAddPatient = async (patient) => {
     try {
@@ -38,11 +38,9 @@ function MainApp() {
 
   const handleUpdatePatient = async (id, updatedPatient) => {
     try {
-      const updated = await updatePatient(id, updatedPatient);
+      const newPatient = await updatePatient(id, updatedPatient);
       setPatients((prevPatients) =>
-        prevPatients.map((patient) =>
-          patient.id === id ? updated : patient
-        )
+        prevPatients.map((p) => (p.id === id ? newPatient : p))
       );
     } catch (error) {
       console.error('Error updating patient:', error);
@@ -52,9 +50,7 @@ function MainApp() {
   const handleDeletePatient = async (id) => {
     try {
       await deletePatient(id);
-      setPatients((prevPatients) =>
-        prevPatients.filter((patient) => patient.id !== id)
-      );
+      setPatients((prevPatients) => prevPatients.filter((p) => p.id !== id));
     } catch (error) {
       console.error('Error deleting patient:', error);
     }
@@ -63,21 +59,21 @@ function MainApp() {
   return (
     <>
       <Navbar />
-      <Container maxWidth="md">
-        <Box mt={4}>
-          <Typography variant="h4" align="center" gutterBottom>
-            Patient Management System
-          </Typography>
-          <PatientForm onSubmit={handleAddPatient} />
-          <PatientList
-            patients={patients}
-            onUpdate={handleUpdatePatient}
-            onDelete={handleDeletePatient}
-          />
-        </Box>
+      <Container maxWidth="sm">
+        <Typography variant="h4" align="center" sx={{ mt: 4 }}>
+          Patient Management System
+        </Typography>
+        <PatientForm onSubmit={handleAddPatient} />
+        <PatientList
+          patients={patients}
+          onUpdate={handleUpdatePatient}
+          onDelete={handleDeletePatient}
+        />
       </Container>
     </>
   );
 }
 
 export default MainApp;
+    
+
