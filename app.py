@@ -3,11 +3,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-
-# Enable CORS for both localhost and the deployed frontend
 CORS(app, origins=["http://localhost:3000", "https://patient-management-system-1-rm4m.onrender.com"])
 
-# Sample in-memory storage for patients
+# In-memory storage
 patients = []
 next_id = 1
 
@@ -24,20 +22,22 @@ def add_patient():
     patients.append(data)
     return jsonify(data), 201
 
-@app.route("/patients/<int:id>", methods=["PUT"])
-def update_patient(id):
+@app.route("/patients/<int:patient_id>", methods=["PUT"])
+def update_patient(patient_id):
     data = request.get_json()
     for patient in patients:
-        if patient["id"] == id:
+        if patient["id"] == patient_id:
             patient.update(data)
             return jsonify(patient)
     return jsonify({"error": "Patient not found"}), 404
 
-@app.route("/patients/<int:id>", methods=["DELETE"])
-def delete_patient(id):
+@app.route("/patients/<int:patient_id>", methods=["DELETE"])
+def delete_patient(patient_id):
     global patients
-    patients = [p for p in patients if p["id"] != id]
+    patients = [p for p in patients if p["id"] != patient_id]
     return jsonify({"message": "Deleted"}), 200
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
