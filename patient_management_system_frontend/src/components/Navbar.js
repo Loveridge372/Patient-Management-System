@@ -1,17 +1,22 @@
 
 import React from 'react';
-import { AppBar, Toolbar, Typography } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box } from '@mui/material';
 
-function Navbar() {
+const Navbar = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" component="div">
+        <Box component="img"
+          src="/PMS_logo.png"
+          alt="PMS Logo"
+          sx={{ height: 40, marginRight: 2 }}
+        />
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Patient Management System
         </Typography>
       </Toolbar>
     </AppBar>
   );
-}
+};
 
 export default Navbar;
