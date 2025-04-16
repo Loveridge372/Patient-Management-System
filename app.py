@@ -1,51 +1,43 @@
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from models import db, Patient
 
 app = Flask(__name__)
-CORS(app, origins=["https://patient-management-system-1-rm4m.onrender"])  
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)
- 
-with app.app_context():
-    db.create_all()
+# Enable CORS for both localhost and the deployed frontend
+CORS(app, origins=["http://localhost:3000", "https://patient-management-system-1-rm4m.onrender.com"])
 
-    def to_dict(self):
-        return {'id': self.id, 'name': self.name, 'age': self.age, 'diagnosis': self.diagnosis}
+# Sample in-memory storage for patients
+patients = []
+next_id = 1
 
-@app.route('/patients', methods=['GET'])
+@app.route("/patients", methods=["GET"])
 def get_patients():
-    patients = Patient.query.all()
-    return jsonify([p.to_dict() for p in patients])
+    return jsonify(patients)
 
-@app.route('/patients', methods=['POST'])
+@app.route("/patients", methods=["POST"])
 def add_patient():
+    global next_id
     data = request.get_json()
-    new_patient = Patient(name=data['name'], age=data['age'], diagnosis=data['diagnosis'])
-    db.session.add(new_patient)
-    db.session.commit()
-    return jsonify(new_patient.to_dict()), 201
+    data["id"] = next_id
+    next_id += 1
+    patients.append(data)
+    return jsonify(data), 201
 
-@app.route('/patients/<int:id>', methods=['PUT'])
+@app.route("/patients/<int:id>", methods=["PUT"])
 def update_patient(id):
     data = request.get_json()
-    patient = Patient.query.get_or_404(id)
+    for patient in patients:
+        if patient["id"] == id:
+            patient.update(data)
+            return jsonify(patient)
+    return jsonify({"error": "Patient not found"}), 404
 
-    patient.name = data['name']
-    patient.age = data['age']
-    patient.diagnosis = data['diagnosis']
+@app.route("/patients/<int:id>", methods=["DELETE"])
+def delete_patient(id):
+    global patients
+    patients = [p for p in patients if p["id"] != id]
+    return jsonify({"message": "Deleted"}), 200
 
-    db.session.commit()
-
-    return jsonify({
-        "id": patient.id,
-        "name": patient.name,
-        "age": patient.age,
-        "diagnosis": patient.diagnosis
-    })
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
