@@ -4,12 +4,12 @@ from flask_cors import CORS
 from models import db, Patient
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+CORS(app, origins=["https://patient-management-system-1-rm4m.onrender"])  
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
-
+ 
 with app.app_context():
     db.create_all()
 
