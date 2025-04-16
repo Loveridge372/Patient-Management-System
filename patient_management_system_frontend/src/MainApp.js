@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import PatientList from "./PatientList";
 import PatientForm from "./PatientForm";
-import { API_BASE } from "./PatientAPI";
+import { API_BASE } from "./PatientAPI.js";
 import "./App.css";
 
 const App = () => {
