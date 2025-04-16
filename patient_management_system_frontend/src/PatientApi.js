@@ -1,5 +1,5 @@
 
-const API_BASE = "https://patient-management-system-1-rm4m.onrender.com";
+const API_BASE = "https://patient-management-system-5bjc.onrender.com";
 
 const parseJSON = async (res) => {
   const text = await res.text();
