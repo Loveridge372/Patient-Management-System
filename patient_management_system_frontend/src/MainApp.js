@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import PatientList from "./PatientList";
 import PatientForm from "./PatientForm";
-import { API_BASE } from './PatientApi'
+import { API_BASE, getPatients, addPatient, updatePatient, deletePatient } from "./PatientApi";
 import "./App.css";
 
 const App = () => {
@@ -12,9 +12,12 @@ const App = () => {
 
   // Fetch all patients
   const fetchPatients = async () => {
-    const response = await fetch(`${API_BASE}/patients`);
-    const data = await response.json();
-    setPatients(data);
+    try {
+      const data = await getPatients();
+      setPatients(data);
+    } catch (error) {
+      console.error("Error fetching patients:", error);
+    }
   };
 
   useEffect(() => {
@@ -22,49 +25,55 @@ const App = () => {
   }, []);
 
   // Add a new patient
-  const addPatient = async (patient) => {
-    const response = await fetch(`${API_BASE}/patients`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(patient),
-    });
-    const data = await response.json();
-    setPatients([...patients, data]);
+  const onAdd = async (patient) => {
+    try {
+      const newPatient = await addPatient(patient);
+      setPatients([...patients, newPatient]);
+    } catch (error) {
+      console.error("Error adding patient:", error);
+    }
   };
 
   // Delete a patient
-  const deletePatient = async (id) => {
-    await fetch(`${API_BASE}/patients/${id}`, {
-      method: "DELETE",
-    });
-    setPatients(patients.filter((p) => p.id !== id));
+  const onDelete = async (id) => {
+    try {
+      await deletePatient(id);
+      setPatients(patients.filter((p) => p.id !== id));
+    } catch (error) {
+      console.error("Error deleting patient:", error);
+    }
   };
 
   // Update a patient
-  const updatePatient = async (id, updatedPatient) => {
-    const response = await fetch(`${API_BASE}/patients/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedPatient),
-    });
-    const data = await response.json();
-    setPatients(patients.map((p) => (p.id === id ? data : p)));
-    setEditingId(null);
-    setEditForm({ name: "", age: "", diagnosis: "" });
+  const onUpdate = async (id, updatedPatient) => {
+    try {
+      const newPatient = await updatePatient(id, updatedPatient);
+      setPatients(patients.map((p) => (p.id === id ? newPatient : p)));
+      setEditingId(null);
+      setEditForm({ name: "", age: "", diagnosis: "" });
+    } catch (error) {
+      console.error("Error updating patient:", error);
+    }
   };
 
   return (
     <div className="App">
       <h1>Patient Management System</h1>
-      <PatientForm onAdd={addPatient} />
-      <PatientList
-        patients={patients}
-        onDelete={deletePatient}
-        onEdit={setEditingId}
+      <PatientForm
+        onAdd={onAdd}
+        onUpdate={onUpdate}
         editingId={editingId}
         editForm={editForm}
         setEditForm={setEditForm}
-        onUpdate={updatePatient}
+      />
+      <PatientList
+        patients={patients}
+        onDelete={onDelete}
+        onEdit={(id) => {
+          const patient = patients.find((p) => p.id === id);
+          setEditingId(id);
+          setEditForm({ name: patient.name, age: patient.age, diagnosis: patient.diagnosis });
+        }}
       />
     </div>
   );
