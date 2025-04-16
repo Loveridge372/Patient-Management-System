@@ -30,3 +30,4 @@ export const deletePatient = async (id) => {
   });
   return res.json();
 };
+export { API_BASE };
