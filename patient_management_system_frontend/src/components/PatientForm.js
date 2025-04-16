@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { TextField, Button, Box } from '@mui/material';
+import { TextField, Button, Paper, Stack } from '@mui/material';
 
 function PatientForm({ onSubmit }) {
   const [name, setName] = useState('');
@@ -14,25 +14,26 @@ function PatientForm({ onSubmit }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-      <TextField
-        label="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        fullWidth
-        margin="normal"
-      />
-      <TextField
-        label="Age"
-        value={age}
-        onChange={(e) => setAge(e.target.value)}
-        fullWidth
-        margin="normal"
-      />
-      <Button type="submit" variant="contained" sx={{ mt: 2 }}>
-        Submit
-      </Button>
-    </Box>
+    <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+      <Stack spacing={2} component="form" onSubmit={handleSubmit}>
+        <TextField
+          label="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          fullWidth
+        />
+        <TextField
+          label="Age"
+          type="number"
+          value={age}
+          onChange={(e) => setAge(e.target.value)}
+          fullWidth
+        />
+        <Button type="submit" variant="contained" fullWidth>
+          Submit
+        </Button>
+      </Stack>
+    </Paper>
   );
 }
 

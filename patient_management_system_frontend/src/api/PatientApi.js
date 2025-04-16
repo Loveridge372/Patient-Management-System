@@ -3,7 +3,6 @@ const API_BASE = "https://patient-management-system-5bjc.onrender.com";
 
 const parseJSON = async (res) => {
   const text = await res.text();
-  console.log("Raw response:", text);
   try {
     return JSON.parse(text);
   } catch (err) {
@@ -20,7 +19,9 @@ const getPatients = async () => {
 const addPatient = async (patient) => {
   const res = await fetch(`${API_BASE}/patients`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(patient),
   });
   return parseJSON(res);
@@ -29,7 +30,9 @@ const addPatient = async (patient) => {
 const updatePatient = async (id, patient) => {
   const res = await fetch(`${API_BASE}/patients/${id}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(patient),
   });
   return parseJSON(res);
@@ -47,5 +50,4 @@ export {
   addPatient,
   updatePatient,
   deletePatient,
-  API_BASE
 };
