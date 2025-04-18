@@ -4,6 +4,7 @@ import { Container, Typography, Box } from '@mui/material';
 import Navbar from './components/Navbar';
 import PatientForm from './components/PatientForm';
 import PatientList from './components/PatientList';
+
 import {
   getPatients,
   addPatient,
@@ -13,35 +14,37 @@ import {
 
 function MainApp() {
   const [patients, setPatients] = useState([]);
+  const [editingPatient, setEditingPatient] = useState(null);
 
   useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        const data = await getPatients();
-        setPatients(data);
-      } catch (error) {
-        console.error('Error fetching patients:', error);
-      }
-    };
-
     fetchPatients();
   }, []);
+
+  const fetchPatients = async () => {
+    try {
+      const data = await getPatients();
+      setPatients(data);
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+    }
+  };
 
   const handleAddPatient = async (patient) => {
     try {
       const newPatient = await addPatient(patient);
-      setPatients((prevPatients) => [...prevPatients, newPatient]);
+      setPatients((prev) => [...prev, newPatient]);
     } catch (error) {
       console.error('Error adding patient:', error);
     }
   };
 
-  const handleUpdatePatient = async (id, updatedPatient) => {
+  const handleUpdatePatient = async (updatedData) => {
     try {
-      const newPatient = await updatePatient(id, updatedPatient);
-      setPatients((prevPatients) =>
-        prevPatients.map((p) => (p.id === id ? newPatient : p))
+      const updated = await updatePatient(updatedData.id, updatedData);
+      setPatients((prev) =>
+        prev.map((p) => (p.id === updated.id ? updated : p))
       );
+      setEditingPatient(null);
     } catch (error) {
       console.error('Error updating patient:', error);
     }
@@ -50,30 +53,38 @@ function MainApp() {
   const handleDeletePatient = async (id) => {
     try {
       await deletePatient(id);
-      setPatients((prevPatients) => prevPatients.filter((p) => p.id !== id));
+      setPatients((prev) => prev.filter((p) => p.id !== id));
     } catch (error) {
       console.error('Error deleting patient:', error);
     }
   };
 
+  const handleEditPatient = (patient) => {
+    setEditingPatient(patient);
+  };
+
   return (
-    <>
+    <div>
       <Navbar />
-      <Container maxWidth="sm">
-        <Typography variant="h4" align="center" sx={{ mt: 4 }}>
+      <Container>
+        <Typography variant="h4" align="center" gutterBottom>
           Patient Management System
         </Typography>
-        <PatientForm onSubmit={handleAddPatient} />
+        <Box my={4}>
+          <PatientForm
+            onSubmit={editingPatient ? handleUpdatePatient : handleAddPatient}
+            editingPatient={editingPatient}
+            setEditingPatient={setEditingPatient}
+          />
+        </Box>
         <PatientList
           patients={patients}
-          onUpdate={handleUpdatePatient}
+          onEdit={handleEditPatient}
           onDelete={handleDeletePatient}
         />
       </Container>
-    </>
+    </div>
   );
 }
 
 export default MainApp;
-    
-

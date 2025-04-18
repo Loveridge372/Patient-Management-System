@@ -1,57 +1,71 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Box } from '@mui/material';
 
-const PatientForm = ({ onAddPatient }) => {
-  const [formData, setFormData] = useState({
-    name: '',
-    age: '',
-    diagnosis: '',
-  });
+const PatientForm = ({ onSubmit, editingPatient, setEditingPatient }) => {
+  const [name, setName] = useState('');
+  const [age, setAge] = useState('');
+  const [diagnosis, setDiagnosis] = useState('');
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  useEffect(() => {
+    if (editingPatient) {
+      setName(editingPatient.name);
+      setAge(editingPatient.age);
+      setDiagnosis(editingPatient.diagnosis || '');
+    } else {
+      setName('');
+      setAge('');
+      setDiagnosis('');
+    }
+  }, [editingPatient]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formData.name && formData.age) {
-      onAddPatient(formData);
-      setFormData({ name: '', age: '', diagnosis: '' }); // Clear form
+
+    const patientData = {
+      name,
+      age,
+      diagnosis,
+    };
+
+    if (editingPatient) {
+      patientData.id = editingPatient.id;
     }
+
+    onSubmit(patientData);
+
+    setName('');
+    setAge('');
+    setDiagnosis('');
+    setEditingPatient(null);
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mb: 4 }}>
-      <TextField
-        label="Name"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-        fullWidth
-        margin="normal"
-      />
-      <TextField
-        label="Age"
-        name="age"
-        type="number"
-        value={formData.age}
-        onChange={handleChange}
-        fullWidth
-        margin="normal"
-      />
-      <TextField
-        label="Diagnosis"
-        name="diagnosis"
-        value={formData.diagnosis}
-        onChange={handleChange}
-        fullWidth
-        margin="normal"
-      />
-      <Button type="submit" variant="contained" color="primary" fullWidth>
-        Submit
-      </Button>
-    </Box>
+    <form onSubmit={handleSubmit}>
+      <Box display="flex" flexDirection="column" gap={2}>
+        <TextField
+          label="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+        <TextField
+          label="Age"
+          type="number"
+          value={age}
+          onChange={(e) => setAge(e.target.value)}
+          required
+        />
+        <TextField
+          label="Diagnosis"
+          value={diagnosis}
+          onChange={(e) => setDiagnosis(e.target.value)}
+        />
+        <Button type="submit" variant="contained" color="primary">
+          {editingPatient ? 'Update' : 'Submit'}
+        </Button>
+      </Box>
+    </form>
   );
 };
 
