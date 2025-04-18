@@ -42,7 +42,19 @@ const deletePatient = async (id) => {
   const res = await fetch(`${API_BASE}/patients/${id}`, {
     method: "DELETE",
   });
-  return parseJSON(res);
+
+  const contentType = res.headers.get("content-type");
+
+  if (!res.ok) {
+    const text = await res.text(); // Avoid JSON parse error
+    throw new Error(`Failed to delete patient (${res.status}): ${text}`);
+  }
+
+  if (contentType && contentType.includes("application/json")) {
+    return res.json();
+  } else {
+    return { message: "Patient deleted" };
+  }
 };
 
 export {
