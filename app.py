@@ -5,7 +5,7 @@ from flask_cors import CORS
 import os
 
 app = Flask(__name__)
-CORS(app, origins=["https://patient-management-system-frontend.onrender.com"])
+CORS(app, origins=["https://patient-management-system-frontend.onrender.com"], methods=["GET", "POST", "PUT", "DELETE"], allow_headers="*")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
