@@ -1,40 +1,58 @@
 
 import React, { useState } from 'react';
-import { TextField, Button, Paper, Stack } from '@mui/material';
+import { TextField, Button, Box } from '@mui/material';
 
-function PatientForm({ onSubmit }) {
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
+const PatientForm = ({ onAddPatient }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    age: '',
+    diagnosis: '',
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ name, age });
-    setName('');
-    setAge('');
+    if (formData.name && formData.age) {
+      onAddPatient(formData);
+      setFormData({ name: '', age: '', diagnosis: '' }); // Clear form
+    }
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-      <Stack spacing={2} component="form" onSubmit={handleSubmit}>
-        <TextField
-          label="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          fullWidth
-        />
-        <TextField
-          label="Age"
-          type="number"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-          fullWidth
-        />
-        <Button type="submit" variant="contained" fullWidth>
-          Submit
-        </Button>
-      </Stack>
-    </Paper>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mb: 4 }}>
+      <TextField
+        label="Name"
+        name="name"
+        value={formData.name}
+        onChange={handleChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        label="Age"
+        name="age"
+        type="number"
+        value={formData.age}
+        onChange={handleChange}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        label="Diagnosis"
+        name="diagnosis"
+        value={formData.diagnosis}
+        onChange={handleChange}
+        fullWidth
+        margin="normal"
+      />
+      <Button type="submit" variant="contained" color="primary" fullWidth>
+        Submit
+      </Button>
+    </Box>
   );
-}
+};
 
 export default PatientForm;
