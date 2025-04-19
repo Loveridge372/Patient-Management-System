@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-CORS(app)  # Enables CORS for all routes
+CORS(app)  
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
